@@ -1,0 +1,12 @@
+# python stuff
+/venv
+
+# raw data files
+data/*
+
+# GCP service account keys
+keys/*.json
+
+# Terraform
+.terraform*
+terraform.*
