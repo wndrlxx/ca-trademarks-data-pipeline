@@ -16,7 +16,6 @@ provider "google" {
 resource "google_storage_bucket" "raw" {
   name          = var.gcs_bucket_name
   location      = var.location
-  project       = var.project
   force_destroy = true
 
   lifecycle_rule {
@@ -27,4 +26,9 @@ resource "google_storage_bucket" "raw" {
       type = "AbortIncompleteMultipartUpload"
     }
   }
+}
+
+resource "google_bigquery_dataset" "dataset" {
+  dataset_id = var.bq_dataset_name
+  location   = var.location
 }

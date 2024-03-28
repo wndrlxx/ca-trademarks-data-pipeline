@@ -11,7 +11,7 @@ variable "location" {
 }
 
 variable "bq_dataset_name" {
-  default = "ca-trademarks"
+  default = "ca_trademarks"
 }
 
 variable "gcs_bucket_name" {
