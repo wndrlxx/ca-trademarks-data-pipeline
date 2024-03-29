@@ -17,7 +17,7 @@ From 2022 to 2023 they received nearly 200 trademark applications per day.
 This batch ELT pipeline is comprised of several GCP services for ingestion, 
 transformation, and serving.
 
-- Cloud Composer 2 (managed Airflow)
+- Cloud Composer 2.6.5 (managed Airflow 2.7.3)
 - Dataproc (managed Spark)
 - Dataflow (templated data processing)
 - Cloud Storage (data lake)
@@ -49,40 +49,47 @@ with billing enabled.
 
 ### GCP Setup
 
-1. Create a new gcloud [named configuration](https://cloud.google.com/sdk/gcloud/reference/config/configurations/create) 
-and activate it. Decide on a project name, which we will refer 
-to as `PROJECT_ID` in later steps.
+1. Decide on a project name and set it as the `$PROJECT_ID` environment variable.
     ```shell copy
-    gcloud config configuration create PROJECT_ID
-    gcloud config configurations activate PROJECT_ID
+    export PROJECT_ID={{YOUR_PROJECT_NAME}}
+    echo $PROJECT_ID
+    ```
+1. Create a new gcloud [named configuration](https://cloud.google.com/sdk/gcloud/reference/config/configurations/create) 
+and activate it. 
+    ```shell copy
+    gcloud config configuration create $PROJECT_ID
+    gcloud config configurations activate $PROJECT_ID
     gcloud config set account YOUR_GCP_EMAIL
     ```
-1. Create a new project using the `PROJECT_ID`.
+1. Create a new project.
     ```shell copy
-    gcloud projects create PROJECT_ID
-    gcloud config set project PROJECT_ID
+    gcloud projects create $PROJECT_ID
+    gcloud config set project $PROJECT_ID
     ```
     If a `WARNING` is returned, you may need to set the 
     [Application Default Credentials](https://cloud.google.com/docs/authentication/application-default-credentials) 
     quota project.
 
     ```shell copy
-    gcloud auth application-default set-quota-project PROJECT_ID
+    gcloud auth application-default set-quota-project $PROJECT_ID
     ```
 1. Verify the new configuration is active with the expected project and account.
     ```shell copy
     gcloud config configurations list
     ```
-1. Link a billing account to the project.️
+1. Link a billing account to the project.️ To see a list of your billing accounts, run:
 
     ***This command is in beta and might change without notice.*** Alternatively,
     you can enable the project's billing account using the Google Cloud Console 
     [web interface](https://cloud.google.com/billing/docs/how-to/modify-project#how-to-enable-billing).
     ```shell copy
-     gcloud beta billing accounts list
-     # Note the ACCOUNT_ID of the billing account you want to use
-     gcloud beta billing projects link PROJECT_ID --billing-account ACCOUNT_ID
-     ```
+    gcloud beta billing accounts list
+    ```
+
+    Make note of the `ACCOUNT_ID` of the billing account you want to use from the returned output and link the project to it.
+    ```shell copy
+    gcloud beta billing projects link $PROJECT_ID --billing-account ACCOUNT_ID
+    ```
 1. Create a new service account and make note of the `EMAIL`. This will be referred to as `SERVICE_ACCOUNT_EMAIL` in the next step.
     ```shell copy
     gcloud iam service-accounts create owner-sa --display-name="DELETE ME LATER"
@@ -95,7 +102,7 @@ to as `PROJECT_ID` in later steps.
     so ensure that you follow the [teardown instructions]() to delete this afterwards.*
 
     ```shell copy
-    gcloud projects add-iam-policy-binding PROJECT_ID \
+    gcloud projects add-iam-policy-binding $PROJECT_ID \
         --member="serviceAccount:SERVICE_ACCOUNT_EMAIL" \
         --role="roles/owner"
     ```
@@ -125,20 +132,35 @@ to as `PROJECT_ID` in later steps.
         storage.googleapis.com \
         storage-component.googleapis.com
     ```
+1. Add the *Cloud Composer v2 API Service Agent Extension* role required to 
+manage Composer 2 environments.
+    ```shell copy
+    # Get current project's project number
+    PROJECT_NUMBER=$(gcloud projects list \
+        --filter="$(gcloud config get-value project)" \
+        --format="value(PROJECT_NUMBER)" \
+        --limit=1)
+
+    gcloud iam service-accounts add-iam-policy-binding \
+        composer-env-account@$PROJECT_ID.iam.gserviceaccount.com \
+        --member serviceAccount:service-$PROJECT_NUMBER@cloudcomposer-accounts.iam.gserviceaccount.com \
+        --role='roles/composer.ServiceAgentV2Ext'
+    ```
 
 ### Terraform Setup
-Use the same `PROJECT_ID` from [GCP Setup]().
+Create a new file called `terraform.tfvars` in the root project directory using this template:
 ```hcl copy
 project = "{{PROJECT_ID}}"
 keyfile = "./keys/owner-sa-key.json"
 ```
 
 ```shell copy
-terraform plan -var="project=<your-gcp-project-id>"
+terraform plan
 ```
 
+This can take 20-40 minutes to complete.
 ```shell copy
-terraform apply -var="project=<your-gcp-project-id>"
+terraform apply
 ```
 
 ### Teardown
@@ -146,10 +168,13 @@ terraform apply -var="project=<your-gcp-project-id>"
     ```shell copy
     terraform destroy
     ```
-1. Delete the `Owner` service account created in [GCP Setup]().
+1. Delete project related service accounts.
 
     ```shell copy
+    # Owner SA
     gcloud iam service-accounts delete SERVICE_ACCOUNT_EMAIL
+    # Composer SA
+    gcloud iam service-accounts delete composer-env-account@$PROJECT_ID.iam.gserviceaccount.com 
     ```
 
 ## See also
