@@ -1,8 +1,10 @@
 variable "project" {}
-
+variable "project_number" {}
 variable "keyfile" {}
 
-variable "owner_service_account" {}
+variable "location" {
+  default = "US"
+}
 
 variable "region" {
   default = "us-west1"
@@ -12,8 +14,8 @@ variable "zone" {
   default = "us-west1-a"
 }
 
-variable "location" {
-  default = "US"
+variable "data_bucket_name" {
+  default = "ca-trademarks-2023-09-12"
 }
 
 variable "bq_dataset_name" {
@@ -30,8 +32,4 @@ variable "composer_bucket_name" {
 
 variable "spark_staging_bucket_name" {
   default = "ca-trademarks-spark-staging"
-}
-
-variable "data_bucket_name" {
-  default = "ca-trademarks-2023-09-12"
 }

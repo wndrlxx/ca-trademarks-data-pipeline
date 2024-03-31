@@ -65,19 +65,22 @@ resource "google_storage_bucket" "spark_staging_bucket" {
 }
 
 resource "google_storage_bucket_object" "raw_folder" {
-  name    = "raw/"
+  name    = "raw/compressed/"
   content = " "
   bucket  = var.data_bucket_name
 
   depends_on = [google_storage_bucket.ca_trademarks]
 }
 
-resource "google_storage_bucket_object" "test" {
-  name   = "raw/scratchpad.txt"
-  source = "scratchpad.txt"
-  bucket = var.data_bucket_name
+# upload dags to Composer bucket
+resource "google_storage_bucket_object" "dags_folder" {
+  for_each = fileset("${path.module}/dags", "**/*")
 
-  depends_on = [google_storage_bucket_object.raw_folder]
+  name   = "dags/${each.key}"
+  source = "${path.module}/dags/${each.key}"
+  bucket = var.composer_bucket_name
+
+  depends_on = [google_composer_environment.ca_trademarks]
 }
 
 resource "google_composer_environment" "ca_trademarks" {
@@ -89,6 +92,14 @@ resource "google_composer_environment" "ca_trademarks" {
 
     software_config {
       image_version = "composer-2.6.5-airflow-2.7.3"
+      airflow_config_overrides = {
+        "scheduler-dag_dir_list_interval" = "20"
+      }
+      env_variables = {
+        PROJECT_ID  = var.project
+        REGION      = var.region
+        DATA_BUCKET = var.data_bucket_name
+      }
     }
 
     node_config {
@@ -100,7 +111,7 @@ resource "google_composer_environment" "ca_trademarks" {
     bucket = var.composer_bucket_name
   }
 
-  depends_on = [google_storage_bucket.composer_bucket]
+  depends_on = [google_storage_bucket.composer_bucket, google_service_account.composer-sa]
 }
 
 resource "google_service_account" "composer-sa" {
@@ -109,17 +120,35 @@ resource "google_service_account" "composer-sa" {
 }
 
 resource "google_project_iam_member" "composer-worker" {
-  project = var.project
-  role    = "roles/composer.worker"
-  member  = "serviceAccount:${google_service_account.composer-sa.email}"
+  project    = var.project
+  role       = "roles/composer.worker"
+  member     = "serviceAccount:${google_service_account.composer-sa.email}"
+  depends_on = [google_service_account.composer-sa]
 }
 
-# TODO: keep this?
-# resource "google_project_iam_member" "composer-service-agent-v2-ext" {
-#   project = var.project
-#   role    = "roles/composer.ServiceAgentV2Ext"
-#   member  = "serviceAccount:${google_service_account.composer-sa.email}"
-# }
+resource "google_project_iam_member" "dataflow-admin" {
+  project    = var.project
+  role       = "roles/dataflow.admin"
+  member     = "serviceAccount:${google_service_account.composer-sa.email}"
+  depends_on = [google_service_account.composer-sa]
+}
+
+resource "google_project_iam_member" "iam-service-account-user" {
+  project    = var.project
+  role       = "roles/iam.serviceAccountUser"
+  member     = "serviceAccount:${google_service_account.composer-sa.email}"
+  depends_on = [google_service_account.composer-sa]
+}
+
+resource "google_service_account_iam_binding" "admin-account-iam" {
+  service_account_id = google_service_account.composer-sa
+  role               = "roles/composer.ServiceAgentV2Ext"
+  members = [
+    "servieAccount:service-${var.project_number}@cloudcomposer-accounts.iam.gserviceaccount.com",
+  ]
+
+  depends_on = [google_service_account.composer-sa]
+}
 
 resource "google_dataproc_cluster" "spark_cluster" {
   name   = "spark-cluster"
