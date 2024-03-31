@@ -36,6 +36,7 @@ transformation, and serving.
 | `TM_application_main_2023-09-12.csv` | Contains the basic information on the trademark application filed, including the primary key (`Application Number`). | [Download](https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023/TM_application_main_2023-09-12.zip) |
 | `TM_interested_party_2023-09-12.csv` | Contains detailed information on the interested parties (Applicant, Registrant, Agent, etc.)| [Download](https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023/TM_application_main_2023-09-12.zip) |
 | `TM_cipo_classification_2023-09-12.csv` | Contains the [Nice Classifications](https://ised-isde.canada.ca/site/canadian-intellectual-property-office/en/trademarks/goods-and-services-manual-class-headings) of the Trademark. | [Download](https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023/TM_cipo_classification_2023-09-12.zip) |
+| `TM_opposition_case_2023-09-12.zip` | Contains information on the opposition case, including details of the plaintiff and defendant. | [Download](https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023/TM_opposition_case_2023-09-12.zip) |
 
 
 ## Instructions
@@ -131,20 +132,6 @@ and activate it.
         dataproc.googleapis.com \
         storage.googleapis.com \
         storage-component.googleapis.com
-    ```
-1. Add the *Cloud Composer v2 API Service Agent Extension* role required to 
-manage Composer 2 environments.
-    ```shell copy
-    # Get current project's project number
-    PROJECT_NUMBER=$(gcloud projects list \
-        --filter="$(gcloud config get-value project)" \
-        --format="value(PROJECT_NUMBER)" \
-        --limit=1)
-
-    gcloud iam service-accounts add-iam-policy-binding \
-        composer-env-account@$PROJECT_ID.iam.gserviceaccount.com \
-        --member serviceAccount:service-$PROJECT_NUMBER@cloudcomposer-accounts.iam.gserviceaccount.com \
-        --role='roles/composer.ServiceAgentV2Ext'
     ```
 
 ### Terraform Setup
