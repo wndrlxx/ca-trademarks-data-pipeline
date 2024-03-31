@@ -96,7 +96,6 @@ resource "google_composer_environment" "ca_trademarks" {
         "scheduler-dag_dir_list_interval" = "20"
       }
       env_variables = {
-        PROJECT_ID  = var.project
         REGION      = var.region
         DATA_BUCKET = var.data_bucket_name
       }
@@ -140,11 +139,11 @@ resource "google_project_iam_member" "iam-service-account-user" {
   depends_on = [google_service_account.composer-sa]
 }
 
-resource "google_service_account_iam_binding" "admin-account-iam" {
-  service_account_id = google_service_account.composer-sa
+resource "google_service_account_iam_binding" "composer-sa-iam" {
+  service_account_id = google_service_account.composer-sa.name
   role               = "roles/composer.ServiceAgentV2Ext"
   members = [
-    "servieAccount:service-${var.project_number}@cloudcomposer-accounts.iam.gserviceaccount.com",
+    "serviceAccount:service-${var.project_number}@cloudcomposer-accounts.iam.gserviceaccount.com",
   ]
 
   depends_on = [google_service_account.composer-sa]
