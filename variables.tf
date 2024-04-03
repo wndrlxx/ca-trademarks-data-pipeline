@@ -29,7 +29,3 @@ variable "composer_env_name" {
 variable "composer_bucket_name" {
   default = "ca-trademarks-composer2"
 }
-
-variable "spark_staging_bucket_name" {
-  default = "ca-trademarks-spark-staging"
-}

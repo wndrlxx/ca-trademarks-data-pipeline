@@ -49,22 +49,7 @@ resource "google_storage_bucket" "composer_bucket" {
   }
 }
 
-resource "google_storage_bucket" "spark_staging_bucket" {
-  name          = var.spark_staging_bucket_name
-  location      = var.region
-  force_destroy = true
-
-  lifecycle_rule {
-    condition {
-      age = 1
-    }
-    action {
-      type = "AbortIncompleteMultipartUpload"
-    }
-  }
-}
-
-resource "google_storage_bucket_object" "raw_folder" {
+resource "google_storage_bucket_object" "raw_compressed_folder" {
   name    = "raw/compressed/"
   content = " "
   bucket  = var.data_bucket_name
@@ -72,7 +57,15 @@ resource "google_storage_bucket_object" "raw_folder" {
   depends_on = [google_storage_bucket.ca_trademarks]
 }
 
-# upload dags to Composer bucket
+resource "google_storage_bucket_object" "transformed_folder" {
+  name    = "transformed/"
+  content = " "
+  bucket  = var.data_bucket_name
+
+  depends_on = [google_storage_bucket.ca_trademarks]
+}
+
+# upload dags, dbt project, and Spark code to Composer bucket
 resource "google_storage_bucket_object" "dags_folder" {
   for_each = fileset("${path.module}/dags", "**/*")
 
@@ -82,6 +75,30 @@ resource "google_storage_bucket_object" "dags_folder" {
 
   depends_on = [google_composer_environment.ca_trademarks]
 }
+
+# upload include/ directory to Composer bucket
+resource "google_storage_bucket_object" "include_folder" {
+  for_each = fileset("${path.module}/include", "**/*")
+
+  name   = "include/${each.key}"
+  source = "${path.module}/include/${each.key}"
+  bucket = var.composer_bucket_name
+
+  depends_on = [google_composer_environment.ca_trademarks]
+}
+
+# upload data/ directory to data bucket
+resource "google_storage_bucket_object" "raw_data_folder" {
+  for_each = fileset("${path.module}/data", "**/*.txt")
+
+  name   = "raw/${each.key}"
+  source = "${path.module}/data/${each.key}"
+  bucket = var.data_bucket_name
+
+  depends_on = [google_composer_environment.ca_trademarks]
+}
+
+
 
 resource "google_composer_environment" "ca_trademarks" {
   name   = var.composer_env_name
@@ -96,8 +113,10 @@ resource "google_composer_environment" "ca_trademarks" {
         "scheduler-dag_dir_list_interval" = "20"
       }
       env_variables = {
-        REGION      = var.region
-        DATA_BUCKET = var.data_bucket_name
+        REGION         = var.region
+        DATA_BUCKET    = var.data_bucket_name
+        AIRFLOW_BUCKET = var.composer_bucket_name
+        BQ_DATASET     = var.bq_dataset_name
       }
     }
 
@@ -132,6 +151,13 @@ resource "google_project_iam_member" "dataflow-admin" {
   depends_on = [google_service_account.composer-sa]
 }
 
+resource "google_project_iam_member" "dataproc-admin" {
+  project    = var.project
+  role       = "roles/dataproc.admin"
+  member     = "serviceAccount:${google_service_account.composer-sa.email}"
+  depends_on = [google_service_account.composer-sa]
+}
+
 resource "google_project_iam_member" "iam-service-account-user" {
   project    = var.project
   role       = "roles/iam.serviceAccountUser"
@@ -147,39 +173,4 @@ resource "google_service_account_iam_binding" "composer-sa-iam" {
   ]
 
   depends_on = [google_service_account.composer-sa]
-}
-
-resource "google_dataproc_cluster" "spark_cluster" {
-  name   = "spark-cluster"
-  region = var.region
-
-  cluster_config {
-    staging_bucket = var.spark_staging_bucket_name
-
-    master_config {
-      num_instances = 1
-      machine_type  = "n1-standard-2"
-      disk_config {
-        boot_disk_size_gb = 40
-      }
-    }
-
-    worker_config {
-      num_instances = 2
-      machine_type  = "n1-standard-2"
-      disk_config {
-        boot_disk_size_gb = 40
-      }
-    }
-
-    preemptible_worker_config {
-      num_instances = 0
-    }
-
-    endpoint_config {
-      enable_http_port_access = true
-    }
-  }
-
-  depends_on = [google_storage_bucket.spark_staging_bucket]
 }
