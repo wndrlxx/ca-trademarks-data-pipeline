@@ -87,9 +87,9 @@ resource "google_storage_bucket_object" "include_folder" {
   depends_on = [google_composer_environment.ca_trademarks]
 }
 
-# upload data/ directory to data bucket
+# upload contents of data/ directory to data bucket
 resource "google_storage_bucket_object" "raw_data_folder" {
-  for_each = fileset("${path.module}/data", "**/*.txt")
+  for_each = fileset("${path.module}/data", "**/*.csv")
 
   name   = "raw/${each.key}"
   source = "${path.module}/data/${each.key}"
@@ -97,8 +97,6 @@ resource "google_storage_bucket_object" "raw_data_folder" {
 
   depends_on = [google_composer_environment.ca_trademarks]
 }
-
-
 
 resource "google_composer_environment" "ca_trademarks" {
   name   = var.composer_env_name
@@ -140,6 +138,13 @@ resource "google_service_account" "composer-sa" {
 resource "google_project_iam_member" "composer-worker" {
   project    = var.project
   role       = "roles/composer.worker"
+  member     = "serviceAccount:${google_service_account.composer-sa.email}"
+  depends_on = [google_service_account.composer-sa]
+}
+
+resource "google_project_iam_member" "bigquery-admin" {
+  project    = var.project
+  role       = "roles/bigquery.admin"
   member     = "serviceAccount:${google_service_account.composer-sa.email}"
   depends_on = [google_service_account.composer-sa]
 }
