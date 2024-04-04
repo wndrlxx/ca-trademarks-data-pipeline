@@ -1,5 +1,6 @@
 # python stuff
 /venv
+__pycache__/
 
 # raw data files
 data/*
