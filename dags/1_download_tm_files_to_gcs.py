@@ -39,8 +39,8 @@ def upload_file_to_gcs(
 
 @dag(
     "upload_raw_trademark_files_to_gcs",
-    description="""Download the raw, compressed data from the CIPO trademarks researcher dataset 
-                website.""",
+    description="""Download the raw, compressed data from the CIPO trademarks 
+                researcher dataset website.""",
     start_date=days_ago(1),
     schedule=None,
     catchup=False,

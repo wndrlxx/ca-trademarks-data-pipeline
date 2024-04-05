@@ -37,6 +37,7 @@ def create_bq_insert_job_operator(table_name, create_query, outlets=[]):
     )
 
 
+# TODO: move these to dbt seed
 def create_bq_table_from_csv(table_name: str, csv_header_col: str):
     create_query = (
         f"LOAD DATA OVERWRITE {DATASET_NAME}.{table_name}"
