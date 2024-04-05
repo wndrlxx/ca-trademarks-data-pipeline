@@ -11,7 +11,6 @@ from pyspark.sql import SparkSession
 # see https://stackoverflow.com/questions/61207679/setting-environment-variables-on-dataproc-cluster-nodes
 DATA_BUCKET_NAME = "ca-trademarks-2023-09-12"
 DATA_BUCKET_FQN = f"gs://{DATA_BUCKET_NAME}"
-RAW_DATA_PATH = f"{DATA_BUCKET_FQN}/raw"
 TRANSFORMED_DATA_PATH = f"{DATA_BUCKET_FQN}/transformed"
 
 spark = (
@@ -21,14 +20,14 @@ spark = (
 )
 
 
-def convert_to_parquet(TmCSV):
+def convert_to_parquet(tm_file):
     df = (
         spark.read.options(delimiter="|", header=True, enforceSchema=True)
-        .schema(TmCSV.schema)
-        .csv(TmCSV.csv_filepath(RAW_DATA_PATH))
+        .schema(tm_file.schema)
+        .csv(tm_file.csv_filepath())
     )
-    df = df.toDF(*TmCSV.renamed_columns)
-    output_dir = f"{TRANSFORMED_DATA_PATH}/{TmCSV.filename}"
+    df = df.toDF(*tm_file.renamed_columns)
+    output_dir = f"{TRANSFORMED_DATA_PATH}/{tm_file.parquet_filename()}"
     df.write.parquet(output_dir, mode="overwrite")
 
 

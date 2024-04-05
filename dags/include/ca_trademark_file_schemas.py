@@ -20,6 +20,9 @@ class TmFileBase:
     def csv_filename(self):
         return f"{self.filename}.csv"
 
+    def parquet_filename(self):
+        return f"{self.filename}.parquet"
+
     def csv_filepath(self):
         """Assumed to be in the raw/ directory"""
         return f"{self.bucket_fqn()}/raw/{self.csv_filename()}"
