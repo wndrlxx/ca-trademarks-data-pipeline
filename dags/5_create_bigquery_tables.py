@@ -81,6 +81,11 @@ with DAG(
         csv_header_col="(party_type_code INT64, description STRING) ",
     )
 
+    """ 
+    Apply time-unit column partitioning on the year of the `registration_date` 
+    to improve WHERE filtering performance for year range analysis. Cluster on 
+    `wipo_status_code` column to improve JOIN and GROUP BY queries.
+    """
     CREATE_APPLICATION_MAIN_TABLE_QUERY = (
         "CREATE OR REPLACE TABLE"
         f"  {PROJECT_ID}.{DATASET_NAME}.application_main "
@@ -96,7 +101,11 @@ with DAG(
         outlets=[Dataset(application_main.bigquery_fqn())],
     )
 
-    """ `party_type_code` values range from 1 to 12 """
+    """ 
+    Apply integer range partitioning on `party_type_code` to bucket data into 
+    12 partitions and cluster by `party_country_code` to improve performance of 
+    per-country analysis.
+    """
     CREATE_INTERESTED_PARTY_TABLE_QUERY = (
         "CREATE OR REPLACE TABLE "
         f"  {PROJECT_ID}.{DATASET_NAME}.interested_party "
@@ -112,7 +121,10 @@ with DAG(
         outlets=[Dataset(interested_party.bigquery_fqn())],
     )
 
-    """ `nice_classification_code` values range from 1 to 45 """
+    """ 
+    Apply integer range partitioning on `nice_classification_code` to group data
+    into 45 partitions for improved filtering performance.
+    """
     CREATE_CIPO_CLASSIFICATION_TABLE_QUERY = (
         "CREATE OR REPLACE TABLE "
         f"  {PROJECT_ID}.{DATASET_NAME}.cipo_classification "
@@ -127,6 +139,9 @@ with DAG(
         outlets=[Dataset(cipo_classification.bigquery_fqn())],
     )
 
+    """
+    Apply clustering on `plaintiff_name` to improve performance of Top-N queries.
+    """
     CREATE_OPPOSITION_CASE_TABLE_QUERY = (
         "CREATE OR REPLACE TABLE "
         f"  {PROJECT_ID}.{DATASET_NAME}.opposition_case "
