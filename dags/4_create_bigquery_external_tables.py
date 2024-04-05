@@ -32,7 +32,7 @@ def create_external_table(tm_file):
         external_table=True,
         autodetect=True,
         deferrable=True,
-        outlets=[Dataset(tm_file.bigquery_fqn())],
+        outlets=[Dataset(tm_file.bigquery_external_table_fqn())],
     )
 
 

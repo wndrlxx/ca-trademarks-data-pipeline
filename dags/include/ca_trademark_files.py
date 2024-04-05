@@ -45,6 +45,9 @@ class TmFileBase:
     def bigquery_fqn(self):
         return f"bigquery:{self.project_id}.{self.dataset_id}.{self.table_id}"
 
+    def bigquery_external_table_fqn(self):
+        return f"{self.bigquery_fqn()}_external"
+
 
 class TmApplicationMainFile(TmFileBase):
     def __init__(self, bucket_name):

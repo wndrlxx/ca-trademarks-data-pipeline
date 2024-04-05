@@ -24,7 +24,7 @@ cipo_classification = TmCipoClassificationFile(DATA_BUCKET_NAME)
 opposition_case = TmOppositionCaseFile(DATA_BUCKET_NAME)
 
 
-def create_bq_insert_job_operator(table_name, create_query):
+def create_bq_insert_job_operator(table_name, create_query, outlets=[]):
     return BigQueryInsertJobOperator(
         task_id=f"create_{table_name}_table",
         configuration={
@@ -33,6 +33,7 @@ def create_bq_insert_job_operator(table_name, create_query):
                 "useLegacySql": False,
             }
         },
+        outlets=outlets,
     )
 
 
@@ -55,10 +56,10 @@ with DAG(
     start_date=days_ago(1),
     catchup=False,
     schedule=[
-        Dataset(application_main.bigquery_fqn()),
-        Dataset(interested_party.bigquery_fqn()),
-        Dataset(cipo_classification.bigquery_fqn()),
-        Dataset(opposition_case.bigquery_fqn()),
+        Dataset(application_main.bigquery_external_table_fqn()),
+        Dataset(interested_party.bigquery_external_table_fqn()),
+        Dataset(cipo_classification.bigquery_external_table_fqn()),
+        Dataset(opposition_case.bigquery_external_table_fqn()),
     ],
 ):
     start = EmptyOperator(task_id="start")
@@ -89,8 +90,9 @@ with DAG(
         ");"
     )
     create_application_main_table = create_bq_insert_job_operator(
-        table_name="application_main",
+        table_name=application_main.table_id,
         create_query=CREATE_APPLICATION_MAIN_TABLE_QUERY,
+        outlets=[Dataset(application_main.bigquery_fqn())],
     )
 
     """ `party_type_code` values range from 1 to 12 """
@@ -104,8 +106,9 @@ with DAG(
         ");"
     )
     create_interested_party_table = create_bq_insert_job_operator(
-        table_name="interested_party",
+        table_name=interested_party.table_id,
         create_query=CREATE_INTERESTED_PARTY_TABLE_QUERY,
+        outlets=[Dataset(interested_party.bigquery_fqn())],
     )
 
     """ `nice_classification_code` values range from 1 to 45 """
@@ -118,8 +121,9 @@ with DAG(
         ");"
     )
     create_cipo_classification_table = create_bq_insert_job_operator(
-        table_name="cipo_classification",
+        table_name=cipo_classification.table_id,
         create_query=CREATE_CIPO_CLASSIFICATION_TABLE_QUERY,
+        outlets=[Dataset(cipo_classification.bigquery_fqn())],
     )
 
     CREATE_OPPOSITION_CASE_TABLE_QUERY = (
@@ -131,8 +135,9 @@ with DAG(
         ");"
     )
     create_opposition_case_table = create_bq_insert_job_operator(
-        table_name="opposition_case",
+        table_name=opposition_case.table_id,
         create_query=CREATE_OPPOSITION_CASE_TABLE_QUERY,
+        outlets=[Dataset(opposition_case.bigquery_fqn())],
     )
 
     ADD_PK_CONSTRAINTS_QUERY = (
