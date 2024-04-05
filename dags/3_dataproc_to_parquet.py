@@ -76,6 +76,7 @@ def convert_to_parquet():
         region=REGION,
         job=PYSPARK_JOB,
         outlets=[
+            Dataset(application_main.parquet_filepath()),
             Dataset(interested_party.parquet_filepath()),
             Dataset(cipo_classification.parquet_filepath()),
             Dataset(opposition_case.parquet_filepath()),
