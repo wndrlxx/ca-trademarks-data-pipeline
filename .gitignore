@@ -1,6 +1,7 @@
 # python stuff
 /venv
 __pycache__/
+*.ipynb
 
 # raw data files
 data/*
