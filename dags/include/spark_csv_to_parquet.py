@@ -32,7 +32,7 @@ def convert_to_parquet(TmCSV):
     df.write.parquet(output_dir, mode="overwrite")
 
 
-convert_to_parquet(TmApplicationMainFile(DATA_BUCKET_FQN))
-convert_to_parquet(TmInterestedPartyFile(DATA_BUCKET_FQN))
-convert_to_parquet(TmCipoClassificationFile(DATA_BUCKET_FQN))
-convert_to_parquet(TmOppositionCaseFile(DATA_BUCKET_FQN))
+convert_to_parquet(TmApplicationMainFile(DATA_BUCKET_NAME))
+convert_to_parquet(TmInterestedPartyFile(DATA_BUCKET_NAME))
+convert_to_parquet(TmCipoClassificationFile(DATA_BUCKET_NAME))
+convert_to_parquet(TmOppositionCaseFile(DATA_BUCKET_NAME))

@@ -13,7 +13,7 @@ class TmFileBase:
     """Base class abstraction to encapsulate the schema definition and renamed columns."""
 
     def __init__(self, bucket_name):
-        self.bucket = bucket_name
+        self.bucket_name = bucket_name
         self.filename = None
         self.source_url_path = "https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023"
 
@@ -26,9 +26,6 @@ class TmFileBase:
 
     def bucket_fqn(self):
         return f"gs://{self.bucket_name}"
-
-    def bucket_name(self):
-        return f"gs://{self.bucket}"
 
 
 class TmApplicationMainFile(TmFileBase):
