@@ -12,7 +12,7 @@ from include.ca_trademark_files import (
     TmOppositionCaseFile,
 )
 
-PROJECT_ID = os.environ.get("PROJECT_ID")
+PROJECT_ID = os.environ.get("PROJECT_ID", "ca-tm-dp")
 REGION = os.environ.get("REGION", "us-west1")
 DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2023-09-12")
 BUCKET_PATH = f"gs://{DATA_BUCKET_NAME}"
