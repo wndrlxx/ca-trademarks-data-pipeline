@@ -43,7 +43,7 @@ def upload_file_to_gcs(
                 researcher dataset website.""",
     start_date=days_ago(1),
     schedule=None,
-    catchup=False,
+    catchup=True,
 )
 def download_tm_files_to_gcs():
     @task
