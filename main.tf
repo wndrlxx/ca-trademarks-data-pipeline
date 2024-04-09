@@ -88,17 +88,6 @@ resource "google_storage_bucket_object" "include_folder" {
   depends_on = [google_composer_environment.ca_trademarks]
 }
 
-# upload contents of data/ directory to data bucket
-resource "google_storage_bucket_object" "raw_data_folder" {
-  for_each = fileset("${path.module}/data", "**/*.csv")
-
-  name   = "raw/${each.key}"
-  source = "${path.module}/data/${each.key}"
-  bucket = var.data_bucket_name
-
-  depends_on = [google_composer_environment.ca_trademarks]
-}
-
 resource "google_composer_environment" "ca_trademarks" {
   name   = var.composer_env_name
   region = var.region
@@ -108,6 +97,9 @@ resource "google_composer_environment" "ca_trademarks" {
 
     software_config {
       image_version = "composer-2.6.5-airflow-2.7.3"
+      pypi_packages = {
+        astronomer-cosmos = ">=1.3.0,<2.0.0"
+      }
       airflow_config_overrides = {
         "scheduler-dag_dir_list_interval" = "20"
       }
