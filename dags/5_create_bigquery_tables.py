@@ -37,23 +37,9 @@ def create_bq_insert_job_operator(table_name, create_query, outlets=[]):
     )
 
 
-# TODO: move these to dbt seed
-def create_bq_table_from_csv(table_name: str, csv_header_col: str):
-    create_query = (
-        f"LOAD DATA OVERWRITE {DATASET_NAME}.{table_name}"
-        f"{csv_header_col} "
-        f"FROM FILES ( "
-        f"  format = 'CSV', "
-        f"  field_delimiter = ';', "
-        f"  skip_leading_rows = 1, "
-        f"  uris = ['{RAW_DATA_PATH}/{table_name}.csv']);"
-    )
-    return create_bq_insert_job_operator(table_name, create_query)
-
-
 with DAG(
     dag_id="bigquery-create-tables",
-    description="Create status code tables and partitioned/clustered application_main table",
+    description="Partition and cluster tables",
     start_date=days_ago(1),
     catchup=False,
     schedule=[
@@ -64,22 +50,6 @@ with DAG(
     ],
 ):
     start = EmptyOperator(task_id="start")
-    create_cipo_status_code_table = create_bq_table_from_csv(
-        table_name="cipo_status_code",
-        csv_header_col="(cipo_status_code INT64, description STRING) ",
-    )
-    create_wipo_status_code_table = create_bq_table_from_csv(
-        table_name="wipo_status_code",
-        csv_header_col="(wipo_status_code INT64, description STRING) ",
-    )
-    create_nice_classification_code_table = create_bq_table_from_csv(
-        table_name="nice_classification_code",
-        csv_header_col="(nice_classification_code INT64, description STRING) ",
-    )
-    create_party_type_code_table = create_bq_table_from_csv(
-        table_name="party_type_code",
-        csv_header_col="(party_type_code INT64, description STRING) ",
-    )
 
     """ 
     Apply time-unit column partitioning on the year of the `registration_date` 
@@ -157,28 +127,12 @@ with DAG(
     )
 
     ADD_PK_CONSTRAINTS_QUERY = (
-        f"ALTER TABLE {DATASET_NAME}.cipo_status_code "
-        f"ADD PRIMARY KEY(cipo_status_code) NOT ENFORCED; "
-        f"ALTER TABLE {DATASET_NAME}.wipo_status_code "
-        f"ADD PRIMARY KEY(wipo_status_code) NOT ENFORCED; "
-        f"ALTER TABLE {DATASET_NAME}.nice_classification_code "
-        f"ADD PRIMARY KEY(nice_classification_code) NOT ENFORCED; "
-        f"ALTER TABLE {DATASET_NAME}.party_type_code "
-        f"ADD PRIMARY KEY(party_type_code) NOT ENFORCED; "
         f"ALTER TABLE {DATASET_NAME}.application_main "
-        f"ADD PRIMARY KEY(application_number) NOT ENFORCED, "
-        f"ADD FOREIGN KEY(wipo_status_code) REFERENCES "
-        f"{DATASET_NAME}.wipo_status_code(wipo_status_code) NOT ENFORCED, "
-        f"ADD FOREIGN KEY(cipo_status_code) REFERENCES "
-        f"{DATASET_NAME}.cipo_status_code(cipo_status_code) NOT ENFORCED; "
+        f"ADD PRIMARY KEY(application_number) NOT ENFORCED; "
         f"ALTER TABLE {DATASET_NAME}.interested_party "
-        f"ADD PRIMARY KEY(application_number) NOT ENFORCED, "
-        f"ADD FOREIGN KEY(party_type_code) REFERENCES "
-        f"{DATASET_NAME}.party_type_code(party_type_code) NOT ENFORCED;"
+        f"ADD PRIMARY KEY(application_number) NOT ENFORCED; "
         f"ALTER TABLE {DATASET_NAME}.cipo_classification "
-        f"ADD PRIMARY KEY(application_number) NOT ENFORCED, "
-        f"ADD FOREIGN KEY(nice_classification_code) REFERENCES "
-        f"{DATASET_NAME}.nice_classification_code(nice_classification_code) NOT ENFORCED;"
+        f"ADD PRIMARY KEY(application_number) NOT ENFORCED; "
         f"ALTER TABLE {DATASET_NAME}.opposition_case "
         f"ADD PRIMARY KEY(application_number) NOT ENFORCED;"
     )
@@ -195,10 +149,6 @@ with DAG(
     (
         start
         >> [
-            create_wipo_status_code_table,
-            create_cipo_status_code_table,
-            create_nice_classification_code_table,
-            create_party_type_code_table,
             create_application_main_table,
             create_interested_party_table,
             create_cipo_classification_table,
