@@ -1,0 +1,23 @@
+version: 2
+
+sources:
+  - name: cipo
+    description: Data from the CIPO Trademarks researcher datasets.
+    database: ca-tm-dp
+    schema: ca_trademarks
+    tables:
+      - name: application_main
+        description: >
+          Contains basic information about the trademark application filed, 
+          including the primary key (`Application Number`).
+      - name: interested_party
+        description: >
+          Contains detailed information about the interested parties (Applicant, 
+          Registrant, Agent, etc.)
+      - name: cipo_classification
+        description: >
+          Contains the Nice Classifications of the Trademark.
+      - name: opposition_case
+        description: >
+          Contains information on the opposition case, including details of the 
+          plaintiff and defendant.

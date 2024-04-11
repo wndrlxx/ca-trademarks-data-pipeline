@@ -1,0 +1,9 @@
+exposures:
+  - name: registered_trademarks_by_category
+    label: Registered Trademarks by Category
+    type: dashboard
+    url: https://lookerstudio.google.com/s/keWPSnG8YgA
+    depends_on:
+      - ref('registrations')
+    owner:
+      name: Andrew

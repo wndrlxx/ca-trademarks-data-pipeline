@@ -1,0 +1,18 @@
+wipo_status_code,wipo_status_description
+1,Application Filed
+2,Filing date accorded
+3,Classification checked
+4,Application accepted
+5,Application published
+6,Opposition pending
+7,Registration published
+8,Application refused
+9,Application withdrawn
+10,Appeal pending
+11,Interruption of Proceeding
+12,Registration cancelled
+13,Conversion requested
+14,Registration surrendered
+15,Revocation Proceeding pending
+16,Invalidity Proceeding pending
+17,Action before court of justice pending 

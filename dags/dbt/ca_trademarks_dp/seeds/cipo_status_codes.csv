@@ -1,0 +1,43 @@
+cipo_status_code,cipo_status_description
+01,Pre-formalized
+02,Formalized
+03,Abandoned Section 36
+04,Abandoned Section 40(3)
+05,Refused
+06,Default - Searched
+07,Approved
+08,Accepted for Publication
+09,Advertised
+10,Opposed
+11,Allowed
+12,Registered
+13,Expunged
+14,Cancelled by Owner
+15,Withdrawn
+17,Inactive - Partial Transfer
+18,Merged
+19,Abandoned
+20,Abandoned – Voluntary Withdrawn by Owner
+21,Withdrawn
+23,Granted
+24,Surrendered
+25,Default - Allowed
+26,Searched
+27,Entered on the List
+28,Removed
+29,Cancelled
+30,Expunged Section 45(3)
+31,Refused - Section 38(8)
+32,Inactivated
+33,Protected
+34,Default - Pre-formalized
+35,Default Formalized
+36,Refused - Awaiting Appeal
+37,Not Recommended
+38,Refused - Appeal in Progress
+40,Registration Pending
+41,Default Registration Pending
+42,Inactive - Transferred
+54,Revoked
+55,Deemed Never Filed
+60,Proposed Opposition

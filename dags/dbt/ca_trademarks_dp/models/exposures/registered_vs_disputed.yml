@@ -1,0 +1,10 @@
+exposures:
+  - name: registered_vs_disputed 
+    label: Trademarks Registered vs Disputed
+    type: dashboard
+    url: https://lookerstudio.google.com/s/keWPSnG8YgA
+    depends_on:
+      - ref('trademark_owners')
+      - ref('plaintiffs')
+    owner:
+      name: Andrew

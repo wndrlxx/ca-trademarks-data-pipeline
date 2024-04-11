@@ -1,0 +1,10 @@
+exposures:
+  - name: applications_and_registrations 
+    label: Trademarks Applications & Registrations
+    type: dashboard
+    url: https://lookerstudio.google.com/s/keWPSnG8YgA
+    depends_on:
+      - ref('filings')
+      - ref('registrations')
+    owner:
+      name: Andrew
