@@ -1,7 +1,6 @@
 import os
 import requests
 from google.cloud import storage
-from airflow.operators.empty import EmptyOperator
 from airflow.datasets import Dataset
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
@@ -12,7 +11,7 @@ from include.ca_trademark_files import (
     TmOppositionCaseFile,
 )
 
-DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2023-09-12")
+DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2024-03-06")
 application_main = TmApplicationMainFile(DATA_BUCKET_NAME)
 interested_party = TmInterestedPartyFile(DATA_BUCKET_NAME)
 cipo_classification = TmCipoClassificationFile(DATA_BUCKET_NAME)
@@ -43,7 +42,7 @@ def upload_file_to_gcs(
                 researcher dataset website.""",
     start_date=days_ago(1),
     schedule=None,
-    catchup=True,
+    catchup=False,
 )
 def download_tm_files_to_gcs():
     @task

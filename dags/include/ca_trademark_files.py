@@ -10,7 +10,9 @@ class TmFileBase:
         self.dataset_id = os.environ.get("BQ_DATASET", "ca_trademarks")
         self.filename = ""
         self.table_id = ""
-        self.source_url_path = "https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023"
+        self.source_url_path = (
+            "https://opic-cipo.ca/cipo/client_downloads/TM_CSV_2024_03_07"
+        )
 
     def source_url(self):
         return f"{self.source_url_path}/{self.zip_filename()}"
@@ -52,26 +54,26 @@ class TmFileBase:
 class TmApplicationMainFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_application_main_2023-09-12"
+        self.filename = "TM_application_main_2024-03-06"
         self.table_id = "application_main"
 
 
 class TmInterestedPartyFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_interested_party_2023-09-12"
+        self.filename = "TM_interested_party_2024-03-06"
         self.table_id = "interested_party"
 
 
 class TmCipoClassificationFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_cipo_classification_2023-09-12"
+        self.filename = "TM_cipo_classification_2024-03-06"
         self.table_id = "cipo_classification"
 
 
 class TmOppositionCaseFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_opposition_case_2023-09-12"
+        self.filename = "TM_opposition_case_2024-03-06"
         self.table_id = "opposition_case"

@@ -15,7 +15,7 @@ variable "zone" {
 }
 
 variable "data_bucket_name" {
-  default = "ca-trademarks-2023-09-12"
+  default = "ca-trademarks-2024-03-06"
 }
 
 variable "bq_dataset_name" {

@@ -16,7 +16,7 @@ from include.ca_trademark_files import (
 )
 
 REGION = os.environ.get("REGION", "us-west1")
-DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2023-09-12")
+DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2024-03-06")
 AIRFLOW_BUCKET = os.environ.get("AIRFLOW_BUCKET", "ca-trademarks-composer2")
 AIRFLOW_INCLUDE_PATH = f"gs://{AIRFLOW_BUCKET}/dags/include"
 

@@ -9,7 +9,7 @@ from pyspark.sql import SparkSession
 # TODO: remove hardcoded values. How to set ENV vars on Spark?
 # see https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dataproc_cluster#initialization_action
 # see https://stackoverflow.com/questions/61207679/setting-environment-variables-on-dataproc-cluster-nodes
-DATA_BUCKET_NAME = "ca-trademarks-2023-09-12"
+DATA_BUCKET_NAME = "ca-trademarks-2024-03-06"
 DATA_BUCKET_FQN = f"gs://{DATA_BUCKET_NAME}"
 TRANSFORMED_DATA_PATH = f"{DATA_BUCKET_FQN}/transformed"
 

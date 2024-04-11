@@ -14,7 +14,7 @@ from include.ca_trademark_files import (
 )
 
 DATASET_NAME = os.environ.get("BQ_DATASET", "ca_trademarks")
-DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2023-09-12")
+DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2024-03-06")
 application_main = TmApplicationMainFile(DATA_BUCKET_NAME)
 interested_party = TmInterestedPartyFile(DATA_BUCKET_NAME)
 cipo_classification = TmCipoClassificationFile(DATA_BUCKET_NAME)

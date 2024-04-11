@@ -14,7 +14,7 @@ from include.ca_trademark_files import (
 
 PROJECT_ID = os.environ.get("PROJECT_ID", "ca-tm-dp")
 REGION = os.environ.get("REGION", "us-west1")
-DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2023-09-12")
+DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2024-03-06")
 BUCKET_PATH = f"gs://{DATA_BUCKET_NAME}"
 
 application_main = TmApplicationMainFile(DATA_BUCKET_NAME)
@@ -36,7 +36,6 @@ opposition_case = TmOppositionCaseFile(DATA_BUCKET_NAME)
     ],
 )
 def extract_gcs_zip_files():
-    # FIXME: output files are missing .CSV extension
     start_template_job = DataflowTemplatedJobStartOperator(
         task_id="bulk-unzip",
         project_id=PROJECT_ID,
