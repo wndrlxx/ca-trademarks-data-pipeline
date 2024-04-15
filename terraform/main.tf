@@ -112,7 +112,7 @@ resource "google_composer_environment" "ca_trademarks" {
         astronomer-cosmos = ">=1.3.0,<2.0.0"
       }
       airflow_config_overrides = {
-        "core.default_task_retry_delay"   = "180", # default is 300s
+        "core-default_task_retry_delay"   = "180", # default is 300s
         "scheduler-dag_dir_list_interval" = "20",
         "secrets-backend"                 = "airflow.providers.google.cloud.secrets.secret_manager.CloudSecretManagerBackend",
         "core-max_active_tasks_per_dag"   = "3" # default 16
