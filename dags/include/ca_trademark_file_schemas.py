@@ -15,7 +15,6 @@ class TmFileBase:
     def __init__(self, bucket_name):
         self.bucket_name = bucket_name
         self.filename = None
-        self.source_url_path = "https://opic-cipo.ca/cipo/client_downloads/Trademarks_ResearcherDataset_CSVTXT_Q2FY2023"
 
     def csv_filename(self):
         return f"{self.filename}.csv"
@@ -34,7 +33,7 @@ class TmFileBase:
 class TmApplicationMainFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_application_main_2023-09-12"
+        self.filename = "TM_application_main_2024-03-06"
 
     schema = StructType(
         [
@@ -182,7 +181,7 @@ class TmApplicationMainFile(TmFileBase):
 class TmInterestedPartyFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_interested_party_2023-09-12"
+        self.filename = "TM_interested_party_2024-03-06"
 
     schema = StructType(
         [
@@ -239,7 +238,7 @@ class TmInterestedPartyFile(TmFileBase):
 class TmCipoClassificationFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_cipo_classification_2023-09-12"
+        self.filename = "TM_cipo_classification_2024-03-06"
 
     schema = StructType(
         [
@@ -258,7 +257,7 @@ class TmCipoClassificationFile(TmFileBase):
 class TmOppositionCaseFile(TmFileBase):
     def __init__(self, bucket_name):
         super().__init__(bucket_name)
-        self.filename = "TM_opposition_case_2023-09-12"
+        self.filename = "TM_opposition_case_2024-03-06"
 
     schema = StructType(
         [
