@@ -1,0 +1,11 @@
+ca_trademarks_dp:
+  target: prod
+  outputs:
+    prod:
+      type: bigquery
+      project: ca-tm-dp
+      dataset: ca_trademarks
+      location: US
+      threads: 2
+      method: service-account
+      keyfile: composer-sa-key.json

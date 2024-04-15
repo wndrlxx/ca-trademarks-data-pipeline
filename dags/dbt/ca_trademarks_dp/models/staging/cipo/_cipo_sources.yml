@@ -2,9 +2,8 @@ version: 2
 
 sources:
   - name: cipo
+    dataset: ca_trademarks
     description: Data from the CIPO Trademarks researcher datasets.
-    database: ca-tm-dp
-    schema: ca_trademarks
     tables:
       - name: application_main
         description: >
