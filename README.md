@@ -64,6 +64,10 @@ analysis.
 
 ## Instructions
 
+> [!NOTE]
+> These instructions have only been tested on an Apple Silicon Mac. YMMV on 
+> other platforms.
+
 ### ✅ Before you begin
 
 1. Have an active [GCP account](https://console.cloud.google.com/freetrial) 
@@ -82,7 +86,7 @@ with billing enabled.
 1. Create a new gcloud [named configuration](https://cloud.google.com/sdk/gcloud/reference/config/configurations/create) 
 and activate it. 
     ```shell copy
-    gcloud config configuration create $PROJECT_ID
+    gcloud config configurations create $PROJECT_ID
     gcloud config configurations activate $PROJECT_ID
     gcloud config set account YOUR_GCP_EMAIL
     ```
@@ -148,7 +152,11 @@ and activate it.
 1. Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the 
 newly created service account key. Terraform will use this later to authenticate.
     ```shell copy
-    export GOOGLE_APPLICATION_CREDENTIALS={{path_to_keyfile}}
+    export GOOGLE_APPLICATION_CREDENTIALS={{full_path_to_keyfile}}
+    ```
+    On Mac, you can run:
+    ```shell copy
+    export GOOGLE_APPLICATION_CREDENTIALS=$(realpath keys/owner-sa-key.json)
     ```
 1. Enable all the services required by the project.
     ```shell copy
@@ -179,7 +187,8 @@ newly created service account key. Terraform will use this later to authenticate
         --filter="$(gcloud config get-value project)" \
         --format="value(PROJECT_NUMBER)"
     ```
-1. Initialize Terraform and review the infrastructure change plan.
+1. Change directory to the `/terraform` folder, initialize Terraform and review 
+    the infrastructure change plan.
     ```shell copy
     terraform init
     terraform plan

@@ -2,10 +2,6 @@
 /venv
 __pycache__/
 *.ipynb
-notebooks/
-
-# raw data files
-data/*
 
 # GCP service account keys
 keys/*.json
@@ -16,3 +12,4 @@ terraform.*
 
 # dbt
 logs/
+.user.yml
