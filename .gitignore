@@ -2,6 +2,7 @@
 /venv
 __pycache__/
 *.ipynb
+notebooks/
 
 # raw data files
 data/*
@@ -12,3 +13,6 @@ keys/*.json
 # Terraform
 .terraform*
 terraform.*
+
+# dbt
+logs/
