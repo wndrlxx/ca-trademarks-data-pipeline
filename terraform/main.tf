@@ -93,15 +93,29 @@ resource "google_composer_environment" "ca_trademarks" {
   region = var.region
 
   config {
+    # Small = 0.5 vCPUs, 2 GB memory, 1 GB storage 
     environment_size = "ENVIRONMENT_SIZE_SMALL"
 
+    workloads_config {
+      worker {
+        cpu        = 1   # default 0.5 vCPUs
+        memory_gb  = 2.5 # default 2 GB
+        storage_gb = 0.5
+        min_count  = 1
+        max_count  = 2
+      }
+    }
+
     software_config {
-      image_version = "composer-2.6.5-airflow-2.7.3"
+      image_version = "composer-2.6.6-airflow-2.7.3"
       pypi_packages = {
         astronomer-cosmos = ">=1.3.0,<2.0.0"
       }
       airflow_config_overrides = {
-        "scheduler-dag_dir_list_interval" = "20"
+        "core.default_task_retry_delay"   = "180", # default is 300s
+        "scheduler-dag_dir_list_interval" = "20",
+        "secrets-backend"                 = "airflow.providers.google.cloud.secrets.secret_manager.CloudSecretManagerBackend",
+        "core-max_active_tasks_per_dag"   = "3" # default 16
       }
       env_variables = {
         REGION         = var.region
