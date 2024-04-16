@@ -68,21 +68,10 @@ resource "google_storage_bucket_object" "transformed_folder" {
 
 # upload dags, dbt project, and Spark code to Composer bucket
 resource "google_storage_bucket_object" "dags_folder" {
-  for_each = fileset("${path.module}/dags", "**/*")
+  for_each = fileset("${path.module}/../dags", "**/*")
 
   name   = "dags/${each.key}"
-  source = "${path.module}/dags/${each.key}"
-  bucket = var.composer_bucket_name
-
-  depends_on = [google_composer_environment.ca_trademarks]
-}
-
-# upload include/ directory to Composer bucket
-resource "google_storage_bucket_object" "include_folder" {
-  for_each = fileset("${path.module}/include", "**/*")
-
-  name   = "include/${each.key}"
-  source = "${path.module}/include/${each.key}"
+  source = "${path.module}/../dags/${each.key}"
   bucket = var.composer_bucket_name
 
   depends_on = [google_composer_environment.ca_trademarks]
@@ -118,6 +107,7 @@ resource "google_composer_environment" "ca_trademarks" {
         "core-max_active_tasks_per_dag"   = "3" # default 16
       }
       env_variables = {
+        PROJECT        = var.project  # PROJECT_ID is a reserved variable
         REGION         = var.region
         DATA_BUCKET    = var.data_bucket_name
         AIRFLOW_BUCKET = var.composer_bucket_name

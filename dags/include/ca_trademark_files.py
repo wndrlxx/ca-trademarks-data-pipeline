@@ -6,7 +6,7 @@ class TmFileBase:
 
     def __init__(self, bucket_name):
         self.bucket_name = bucket_name
-        self.project_id = os.environ.get("PROJECT_ID", "ca-tm-dp")
+        self.project_id = os.environ.get("PROJECT", "ca-tm-dp")
         self.dataset_id = os.environ.get("BQ_DATASET", "ca_trademarks")
         self.filename = ""
         self.table_id = ""

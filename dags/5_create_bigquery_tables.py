@@ -13,7 +13,7 @@ from include.ca_trademark_files import (
     TmOppositionCaseFile,
 )
 
-PROJECT_ID = os.environ.get("PROJECT_ID", "ca-tm-dp")
+PROJECT_ID = os.environ.get("PROJECT", "ca-tm-dp")
 DATASET_NAME = os.environ.get("BQ_DATASET", "ca_trademarks")
 DATA_BUCKET_NAME = os.environ.get("DATA_BUCKET", "ca-trademarks-2024-03-06")
 DATA_BUCKET_FQN = f"gs://{DATA_BUCKET_NAME}"
