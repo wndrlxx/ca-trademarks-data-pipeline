@@ -1,8 +1,3 @@
-{# 
-Apply integer range partitioning on `party_type_code` to bucket data into 
-12 partitions and cluster by `party_country_code` to improve performance of 
-per-country analysis.
-#}
 with
 interested_parties as (
     select * from {{ ref('base_cipo__interested_parties') }}

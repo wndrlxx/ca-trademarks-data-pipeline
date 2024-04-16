@@ -1,8 +1,3 @@
-{# """ 
-Apply time-unit column partitioning on the year of the `registration_date` 
-to improve WHERE filtering performance for year range analysis. Cluster on 
-`wipo_status_code` column to improve JOIN and GROUP BY queries.
-) #}
 with
 applications as (
     select * from {{ ref('base_cipo__applications') }}
@@ -26,9 +21,9 @@ join_applications as (
         mark_verbal_element_text as trademark_text,
         trademark_class_code
     from applications
-    join wipo_status_codes
+    left join wipo_status_codes
     using (wipo_status_code)
-    join cipo_status_codes
+    left join cipo_status_codes
     using (cipo_status_code)
 )
 

@@ -1,15 +1,3 @@
-{# """ 
-  Apply integer range partitioning on `nice_classification_code` to group data
-  into 45 partitions for improved filtering performance.
-  """
-  CREATE_CIPO_CLASSIFICATION_TABLE_QUERY = (
-      "CREATE OR REPLACE TABLE "
-      f"  {PROJECT_ID}.{DATASET_NAME}.cipo_classification "
-      "PARTITION BY RANGE_BUCKET(nice_classification_code, GENERATE_ARRAY(1, 46, 1)) "
-      "AS ("
-      f"  SELECT * FROM {PROJECT_ID}.{DATASET_NAME}.external_cipo_classification"
-      ");"
-  ) #}
 with 
 cipo_classifications as (
     select * from {{ ref('base_cipo__cipo_classifications') }}
