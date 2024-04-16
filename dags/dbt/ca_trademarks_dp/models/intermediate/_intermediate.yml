@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: int_filings_grouped_and_aggregated
+    description: Trademark applications that have a filing_date.
+  - name: int_registrations_grouped_and_aggregated
+    description: Trademark applications that have a registration_date.
+  - name: int_applications_filtered_by_active
+    description: Trademark applications that are registered and active.

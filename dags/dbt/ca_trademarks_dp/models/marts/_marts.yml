@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: filings_categories
+    description: Filings grouped by decade, year, and category.
+  - name: filings
+    description: Filings grouped by decade and year.
+  - name: plaintiffs
+    description: Trademark opposition plaintiff names and count.
+  - name: registrations_categories
+    description: Registrations grouped by decade, year, and category.
+  - name: registrations
+    description: Registrations grouped by decade and year.
+  - name: trademark_owners
+    description: Trademark owner names and count.
