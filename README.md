@@ -55,7 +55,7 @@ analysis.
 | TM_application_main_2024-03-06.csv | Contains basic information about the trademark application filed, including the primary key (`Application Number`). | 1,971,623 | [Download](https://opic-cipo.ca/cipo/client_downloads/TM_CSV_2024_03_07/TM_application_main_2024-03-06.zip) |
 | TM_interested_party_2024-03-06.csv | Contains detailed information about the interested parties (Applicant, Registrant, Agent, etc.)| 4,604,423 | [Download](https://opic-cipo.ca/cipo/client_downloads/TM_CSV_2024_03_07/TM_interested_party_2024-03-06.zip) |
 | TM_cipo_classification_2024-03-06.csv | Contains the [Nice Classifications](https://ised-isde.canada.ca/site/canadian-intellectual-property-office/en/trademarks/goods-and-services-manual-class-headings) of the Trademark. | 6,262,267 | [Download](https://opic-cipo.ca/cipo/client_downloads/TM_CSV_2024_03_07/TM_cipo_classification_2024-03-06.zip) |
-| TM_opposition_case_2024-03-06.zip | Contains information on the opposition case, including details of the plaintiff and defendant. | 40,216 | [Download](https://opic-cipo.ca/cipo/client_downloads/TM_CSV_2024_03_07/TM_opposition_case_2024-03-06.zip) |
+| TM_opposition_case_2024-03-06.csv | Contains information on the opposition case, including details of the plaintiff and defendant. | 40,216 | [Download](https://opic-cipo.ca/cipo/client_downloads/TM_CSV_2024_03_07/TM_opposition_case_2024-03-06.zip) |
 | cipo_status_codes.csv | Mapping of CIPO status code IDs and descriptions. | 42 | [Link](https://ised-isde.canada.ca/site/canadian-intellectual-property-office/en/trademarks-researcher-datasets-data-dictionary) |
 | wipo_status_codes.csv | Mapping of WIPO (World Intellectual Property Organization) status code IDs and descriptions. | 17 | [Link](https://ised-isde.canada.ca/site/canadian-intellectual-property-office/en/trademarks-researcher-datasets-data-dictionary) |
 | party_type_codes.csv | Mapping of party type code IDs and descriptions. | 7 | [Link](https://ised-isde.canada.ca/site/canadian-intellectual-property-office/en/trademarks-researcher-datasets-data-dictionary) |
@@ -133,7 +133,7 @@ and activate it.
         --role="roles/owner"
     ```
 1. Confirm the `Owner` service account was successfully created and that it has
-  the the owner basic role assigned.
+  the owner basic role assigned.
     ```shell copy
     gcloud iam service-accounts list
     gcloud projects get-iam-policy $PROJECT_ID \
@@ -224,19 +224,9 @@ newly created service account key. Terraform will use this later to authenticate
     gcloud iam service-accounts keys create \
         ./keys/composer-sa-key.json \
         --iam-account=composer-env-account@${PROJECT_ID}.iam.gserviceaccount.com
-
-    # Note the KEY_ID of the key that was just created.
-    gcloud iam service-accounts keys list \
-        --iam-account=composer-env-account@${PROJECT_ID}.iam.gserviceaccount.com
     ```
-1. Download the keyfile locally and upload it to the dbt folder.
+1. Upload the keyfile to the dbt folder.
     ```shell copy
-    # Run this from the root directory of the project
-    gcloud beta iam service-accounts keys get-public-key <KEY_ID> \
-        --iam-account=composer-env-account@${PROJECT_ID}.iam.gserviceaccount.com \
-        --output-file=./keys/composer-sa-key.json
-
-    # Upload keyfile to dbt project folder
     gcloud composer environments storage dags import \
         --source='keys/composer-sa-key.json' \
         --destination='dbt/ca_trademarks_dp/' \
