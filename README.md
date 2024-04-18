@@ -103,6 +103,7 @@ with billing enabled.
     ```
 
 ### Make install
+
 *Run the following commands from the root project directory.*
 
 1. Verify the environment variables are correctly set.
@@ -126,11 +127,15 @@ path of the service account key. Terraform will need this to authenticate.
     ```shell copy
     make enable-gcp-services
     ```
-1. Provision infrastructure. 
+1. Provision infrastructure. Type `yes` to approve actions.
     ```shell copy
-    make -f terraform.Makefile up
+    make -f tf.Makefile up
     ```
-    Type `yes` to approve actions.
+
+    *If this step fails, you can try running:*
+    ```shell copy
+    make -f tf.Makefile retry
+    ```
 1. Complete dbt-core setup.
     ```shell copy
     make dbt-setup
@@ -157,16 +162,13 @@ upstream DAGs. Execution of the entire pipeline can take over 20 minutes.
 
 ### 💥 Teardown
 
-1. Deprovision project related infrastructure and delete owner service account. 
-    This will take ~6 minutes.
+1. Deprovision project related infrastructure. Type `yes` to approve actions.
     ```shell copy
-    make -f terraform.Makefile down
+    make -f tf.Makefile down
     ```
-1. [Delete](https://cloud.google.com/storage/docs/deleting-buckets#delete-bucket-console) 
-any additional staging buckets created by Dataflow and Dataproc.
+1. Delete the GCP project. Type `Y` to confirm.
     ```shell copy
-    gsutil ls
-    gsutil -m rm -r <bucket_to_remove>
+    make gcp-down
     ```
 
 ## See also

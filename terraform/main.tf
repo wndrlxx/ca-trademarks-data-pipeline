@@ -168,6 +168,7 @@ resource "google_project_iam_member" "iam-service-account-user" {
 }
 
 resource "google_service_account_iam_binding" "composer-sa-iam" {
+  # Grant role to Google-managed service account: Cloud Composer API Service Agent
   service_account_id = google_service_account.composer-sa.name
   role               = "roles/composer.ServiceAgentV2Ext"
   members = [
