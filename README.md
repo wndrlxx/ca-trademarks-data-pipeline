@@ -79,7 +79,7 @@ with billing enabled.
     ```
 1. You have GNU Make 3.81 or newer installed.
 
-### Set environment variables
+### 🌱 Set environment variables
 
 1. Decide on a project name and set it as the `$PROJECT_ID` environment variable.
     ```shell copy
@@ -102,7 +102,7 @@ with billing enabled.
     export GCP_REGION={{REGION}}
     ```
 
-### Make install
+### 🔧 Make install
 
 *Run the following commands from the root project directory.*
 
@@ -127,7 +127,8 @@ path of the service account key. Terraform will need this to authenticate.
     ```shell copy
     make enable-gcp-services
     ```
-1. Provision infrastructure. Type `yes` to approve actions.
+1. Provision infrastructure. Type `yes` to approve actions. 
+    *This step can take 40+ minutes to complete.*
     ```shell copy
     make -f tf.Makefile up
     ```
@@ -155,7 +156,7 @@ upstream DAGs. Execution of the entire pipeline can take over 20 minutes.
 [Airflow UI](https://airflow.apache.org/docs/apache-airflow/stable/ui.html).
 
 > [!IMPORTANT]
-> The `dbt` DAG is a task group composed of 16 tasks and dependencies. Depending
+> The `dbt` DAG is a task group composed of 20 tasks and dependencies. Depending
 > on resource availability, you may be required to
 [manually rerun them.](https://docs.astronomer.io/learn/rerunning-dags#manually-rerun-tasks-or-dags)
 
