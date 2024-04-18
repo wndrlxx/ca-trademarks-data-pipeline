@@ -14,11 +14,18 @@ PROJECT_NUMBER := $(shell gcloud projects list \
 	--filter="$$(gcloud config get-value project)" \
 	--format="value(PROJECT_NUMBER)")
 
+retry:
+	terraform -chdir=./terraform apply \
+	-var "project=${PROJECT_ID}" \
+	-var "region=${GCP_REGION}" \
+	-var "project_number=${PROJECT_NUMBER}"
+
 up:
 	terraform -chdir=./terraform init
-	terraform -chdir=./terraform apply -var 'project=${PROJECT_ID}' \
-		-var 'region=${GCP_REGION} -var 'project_number=${PROJECT_NUMBER}'
+	make -f $(firstword $(MAKEFILE_LIST)) retry
 
 down:
-	terraform -chdir=./terraform destroy
-	make delete-owner-sa
+	terraform -chdir=./terraform destroy \
+	-var "project=${PROJECT_ID}" \
+	-var "region=${GCP_REGION}" \
+	-var "project_number=${PROJECT_NUMBER}"
