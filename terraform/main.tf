@@ -15,13 +15,13 @@ provider "google" {
 
 resource "google_bigquery_dataset" "ca_trademarks" {
   dataset_id                 = var.bq_dataset_name
-  location                   = var.location
+  location                   = var.region
   delete_contents_on_destroy = true
 }
 
 resource "google_storage_bucket" "ca_trademarks" {
   name          = var.data_bucket_name
-  location      = var.location
+  location      = var.region
   force_destroy = true
 
   lifecycle_rule {
@@ -107,7 +107,7 @@ resource "google_composer_environment" "ca_trademarks" {
         "core-max_active_tasks_per_dag"   = "3" # default 16
       }
       env_variables = {
-        PROJECT        = var.project  # PROJECT_ID is a reserved variable
+        PROJECT        = var.project # PROJECT_ID is a reserved variable
         REGION         = var.region
         DATA_BUCKET    = var.data_bucket_name
         AIRFLOW_BUCKET = var.composer_bucket_name
