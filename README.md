@@ -65,8 +65,7 @@ analysis.
 ## Instructions
 
 > [!NOTE]
-> These instructions have only been tested on an Apple Silicon Mac. YMMV on 
-> other platforms.
+> These instructions have only been tested on macOS. YMMV on other platforms.
 
 ### ✅ Before you begin
 
@@ -74,166 +73,73 @@ analysis.
 with billing enabled.
 1. You've [installed Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli).
 1. [gcloud CLI is installed](https://cloud.google.com/sdk/docs/install).
+    ```shell copy
+    # macOS install using Homebrew
+    brew install --cask google-cloud-sdk
+    ```
+1. You have GNU Make 3.81 or newer installed.
 
-
-### ⚙️ GCP Setup
+### Set environment variables
 
 1. Decide on a project name and set it as the `$PROJECT_ID` environment variable.
     ```shell copy
     export PROJECT_ID={{YOUR_PROJECT_NAME}}
-    echo $PROJECT_ID
     ```
-1. Create a new gcloud [named configuration](https://cloud.google.com/sdk/gcloud/reference/config/configurations/create) 
-and activate it. 
+1. Set the `$GCP_EMAIL` environment variable to the email associated with your 
+    active GCP account.
     ```shell copy
-    gcloud config configurations create $PROJECT_ID
-    gcloud config configurations activate $PROJECT_ID
-    gcloud config set account YOUR_GCP_EMAIL
+    export GCP_EMAIL={{YOUR_GCP_EMAIL}}
     ```
-1. Create a new project.
+1. Set the `$BILLING_ACCOUNT_ID` environment variable to the value of the 
+    `ACCOUNT_ID` returned by `gcloud billing accounts list` that you wish to 
+    link to this Google Cloud project. 
     ```shell copy
-    gcloud projects create $PROJECT_ID
-    gcloud config set project $PROJECT_ID
+    export BILLING_ACCOUNT_ID={{ACCOUNT_ID}}
     ```
-    If a `WARNING` is returned, you may need to set the 
-    [Application Default Credentials](https://cloud.google.com/docs/authentication/application-default-credentials) 
-    quota project.
-
+1. Set `$GCP_REGION` to your desired 
+[GCP region](https://cloud.google.com/compute/docs/regions-zones#available).
     ```shell copy
-    gcloud auth application-default set-quota-project $PROJECT_ID
-    ```
-1. Verify the new configuration is active with the expected project and account.
-    ```shell copy
-    gcloud config configurations list
-    ```
-1. Link a billing account to the project.️ To see a list of your billing accounts, run:
-    ```shell copy
-    # This command is in beta and might change without notice!
-    gcloud beta billing accounts list
+    export GCP_REGION={{REGION}}
     ```
 
-    Make note of the `ACCOUNT_ID` of the billing account you want to use from the returned output and link the project to it.
-    ```shell copy
-    gcloud beta billing projects link $PROJECT_ID --billing-account ACCOUNT_ID
-    ```
-1. Create a new service account.
-    ```shell copy
-    gcloud iam service-accounts create owner-sa --display-name="DELETE ME LATER"
-    ```
-1. Grant the `Owner` role to the service account. 
+### Make install
+*Run the following commands from the root project directory.*
 
-    *Note: granting basic roles in production environments is against 
-    [best practices](https://cloud.google.com/iam/docs/best-practices-service-accounts), 
-    so ensure that you follow the [teardown instructions]() to delete this 
-    afterwards.*
-
+1. Verify the environment variables are correctly set.
     ```shell copy
-    gcloud projects add-iam-policy-binding $PROJECT_ID \
-        --member="serviceAccount:owner-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
-        --role="roles/owner"
+    make env-test
     ```
-1. Confirm the `Owner` service account was successfully created and that it has
-  the owner basic role assigned.
+1. Initialize a new GCP project and service account.
     ```shell copy
-    gcloud iam service-accounts list
-    gcloud projects get-iam-policy $PROJECT_ID \
-        --flatten="bindings[].members" \
-        --format='table(bindings.role)' \
-        --filter="bindings.members:owner-sa@${PROJECT_ID}.iam.gserviceaccount.com"
+    make gcp-up
     ```
-1. Generate a service account key (`owner-sa-key.json`) and save it to the 
-`/keys` project directory. 
-    ```shell copy
-    # Run this from the root directory of the project
-    gcloud iam service-accounts keys create \
-        ./keys/owner-sa-key.json \
-        --iam-account=owner-sa@$PROJECT_ID.iam.gserviceaccount.com
-    ```
-1. Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the 
-newly created service account key. Terraform will use this later to authenticate.
+1. Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the absolute 
+path of the service account key. Terraform will need this to authenticate.
     ```shell copy
     export GOOGLE_APPLICATION_CREDENTIALS={{full_path_to_keyfile}}
     ```
-    On Mac, you can run:
+    On macOS:
     ```shell copy
     export GOOGLE_APPLICATION_CREDENTIALS=$(realpath keys/owner-sa-key.json)
     ```
-1. Enable all the services required by the project.
+1. Enable all the Google APIs required by the project.
     ```shell copy
-    # This may take a minute to complete
-    gcloud services enable \
-        bigquery.googleapis.com \
-        composer.googleapis.com \
-        dataflow.googleapis.com \
-        dataproc.googleapis.com \
-        storage.googleapis.com \
-        storage-component.googleapis.com
+    make enable-gcp-services
     ```
-
-
-### 🌱 Terraform Setup
-
-1. Create a new file called `terraform.tfvars` in the `/terraform` project 
-    directory using this template:
-    ```hcl copy
-    project = "{{PROJECT_ID}}"
-    project_number = "{{PROJECT_NUMBER}}"
-    keyfile = "../keys/owner-sa-key.json"
-    ```
-
-    You can find your `PROJECT_NUMBER` by running:
+1. Provision infrastructure. 
     ```shell copy
-    gcloud projects list \
-        --filter="$(gcloud config get-value project)" \
-        --format="value(PROJECT_NUMBER)"
+    make -f terraform.Makefile up
     ```
-1. Change directory to the `/terraform` folder, initialize Terraform and review 
-    the infrastructure change plan.
+    Type `yes` to approve actions.
+1. Complete dbt-core setup.
     ```shell copy
-    terraform init
-    terraform plan
-    ```
-1. Begin provisioning infrastructure. It can take 25+ minutes for this step to 
-    complete and an additional few minutes for Cloud Composer to load all the DAGs.
-    ```shell copy
-    terraform apply
-    ```
-
-### dbt Setup
-
-1. Update the *`project`* attribute with the name of your `PROJECT_ID` in 
-[`profiles.yml`](/dags/dbt/ca_trademarks_dp/profiles.yml#L6) to complete the 
-`dbt-bigquery` connector setup.
-1. Upload the updated `profiles.yml` to the dbt project folder.
-    ```shell copy
-    # Run this from the root directory of the project
-    gcloud composer environments storage dags import \
-        --source='dags/dbt/ca_trademarks_dp/profiles.yml' \
-        --destination='dbt/ca_trademarks_dp/' \
-        --environment='ca-trademarks-composer2' \
-        --location='us-west1'
+    make dbt-setup
     ```
 
 ### 🚀 Initialize Airflow DAGs
 
-1. Generate a service account key (`composer-sa-key.json`) for the Cloud Composer
-  service account created by the Terraform script and save it to the `/keys` 
-  project directory. 
-    ```shell copy
-    # Run this from the root directory of the project
-    gcloud iam service-accounts keys create \
-        ./keys/composer-sa-key.json \
-        --iam-account=composer-env-account@${PROJECT_ID}.iam.gserviceaccount.com
-    ```
-1. Upload the keyfile to the dbt folder.
-    ```shell copy
-    gcloud composer environments storage dags import \
-        --source='keys/composer-sa-key.json' \
-        --destination='dbt/ca_trademarks_dp/' \
-        --environment='ca-trademarks-composer2' \
-        --location='us-west1'
-    ```
-1. Navigate to your [Cloud Composer environments](https://console.cloud.google.com/composer/environments) 
+1. Navigate to your 
+[Cloud Composer environments](https://console.cloud.google.com/composer/environments) 
 on Google Cloud console.
 1. In the Airflow webserver column, follow the link to access the Airflow UI.
 1. To initialize the data pipeline, start the ***upload_raw_trademark_files_to_gcs*** 
@@ -251,15 +157,10 @@ upstream DAGs. Execution of the entire pipeline can take over 20 minutes.
 
 ### 💥 Teardown
 
-1. Deprovision project related infrastructure. This will take ~6 minutes.
+1. Deprovision project related infrastructure and delete owner service account. 
+    This will take ~6 minutes.
     ```shell copy
-    cd terraform/
-    terraform destroy
-    ```
-1. Delete project related service accounts.
-    ```shell copy
-    # Owner SA
-    gcloud iam service-accounts delete owner-sa@$PROJECT_ID.iam.gserviceaccount.com 
+    make -f terraform.Makefile down
     ```
 1. [Delete](https://cloud.google.com/storage/docs/deleting-buckets#delete-bucket-console) 
 any additional staging buckets created by Dataflow and Dataproc.
