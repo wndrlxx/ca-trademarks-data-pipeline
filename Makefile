@@ -1,17 +1,17 @@
 ifndef PROJECT_ID
-$(error PROJECT_ID environment variable is not set. Please set it and try again.)
+$(error ❌ PROJECT_ID environment variable not set. Set it and try again.)
 endif
 
 ifndef GCP_REGION
-$(error GCP_REGION environment variable is not set. Please set it and try again.)
+$(error ❌ GCP_REGION environment variable not set. Set it and try again.)
 endif
 
 ifndef GCP_EMAIL
-$(error GCP_EMAIL environment variable is not set. Please set it and try again.)
+$(error ❌ GCP_EMAIL environment variable not set. Set it and try again.)
 endif
 
 ifndef BILLING_ACCOUNT_ID
-$(error BILLING_ACCOUNT_ID environment variable is not set. Please set it and try again.)
+$(error ❌ BILLING_ACCOUNT_ID environment variable not set. Set it and try again.)
 endif
 
 env-test:
@@ -21,6 +21,7 @@ env-test:
 	@echo BILLING_ACCOUNT_ID = ${BILLING_ACCOUNT_ID}
 
 gcp-up: gcloud-config gcloud-new-project create-owner-sa-and-key
+	@echo ====== ✅ Completed GCP project creation \(${PROJECT_ID}\)
 
 gcloud-config:
 	@echo ====== Creating new gcloud named configuration...
@@ -32,6 +33,7 @@ gcloud-new-project:
 	@echo ====== Creating new Google Cloud project...
 	gcloud projects create ${PROJECT_ID}
 	gcloud config set project ${PROJECT_ID}
+	gcloud services enable cloudresourcemanager.googleapis.com
 	gcloud auth application-default set-quota-project ${PROJECT_ID}
 	@echo ====== Linking billing account to project...
 	gcloud billing projects link ${PROJECT_ID} --billing-account ${BILLING_ACCOUNT_ID}
@@ -56,16 +58,13 @@ enable-gcp-services:
 		dataproc.googleapis.com \
 		storage.googleapis.com \
 		storage-component.googleapis.com
-
-composer-up: create-composer-key upload-composer-key
+	@echo ====== ✅ GCP APIs enabled!
 
 create-composer-key:
 	@echo ====== Creating Composer service account key...
 	gcloud iam service-accounts keys create \
 		./keys/composer-sa-key.json \
 		--iam-account=composer-env-account@${PROJECT_ID}.iam.gserviceaccount.com
-
-upload-composer-key:
 	@echo ====== Uploading service account key...
 	gcloud composer environments storage dags import \
 		--source='keys/composer-sa-key.json' \
@@ -81,9 +80,17 @@ dbt-setup:
 		--destination='dbt/ca_trademarks_dp/' \
 		--environment='ca-trademarks-composer2' \
 		--location=${GCP_REGION}
-	composer-up
-	@echo ====== Completed dbt setup!
+	make -f $(firstword $(MAKEFILE_LIST)) create-composer-key
+	@echo ====== ✅ Completed dbt setup
 
-delete-owner-sa:
-	@echo ====== Deleting owner service account...
+gcp-down:
+	@echo ====== Deleting GCP project and service account keys \(${PROJECT_ID}\)...
 	gcloud iam service-accounts delete owner-sa@${PROJECT_ID}.iam.gserviceaccount.com 
+	gcloud projects delete ${PROJECT_ID}
+	rm ./keys/owner-sa-key.json
+	rm ./keys/composer-sa-key.json
+	@echo ====== Switching to default configuration...
+	gcloud config configurations activate default
+	@echo ====== Deleting named configuration...
+	gcloud config configurations delete ${PROJECT_ID}
+	@echo ====== ✅ Completed GCP project deletion \(${PROJECT_ID}\)
