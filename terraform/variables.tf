@@ -1,17 +1,9 @@
 variable "project" {}
 variable "project_number" {}
-variable "keyfile" {}
+variable "region" {}
 
-variable "location" {
-  default = "US"
-}
-
-variable "region" {
-  default = "us-west1"
-}
-
-variable "zone" {
-  default = "us-west1-a"
+variable "keyfile" {
+  default = "../keys/owner-sa-key.json"
 }
 
 variable "data_bucket_name" {
