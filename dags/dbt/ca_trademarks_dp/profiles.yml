@@ -5,7 +5,7 @@ ca_trademarks_dp:
       type: bigquery
       project: ca-tm-dp
       dataset: ca_trademarks
-      location: US
+      location: us-west1
       threads: 2
       method: service-account
       keyfile: composer-sa-key.json
