@@ -13,4 +13,10 @@ if [ -z "$PROJECT_ID" ]; then
     exit 1
 fi
 
+if [ -z "$GCP_REGION" ]; then
+    echo "Error: GCP_REGION environment variable is not set."
+    exit 1
+fi
+
 sed -i '' "s/project: [^[:space:]]*/project: $PROJECT_ID/g" "$PROFILES_YML_PATH"
+sed -i '' "s/location: [^[:space:]]*/location: $GCP_REGION/g" "$PROFILES_YML_PATH"
