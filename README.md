@@ -155,6 +155,8 @@ upstream DAGs. Execution of the entire pipeline can take over 20 minutes.
 1. Progress of each DAG can be monitored from the 
 [Airflow UI](https://airflow.apache.org/docs/apache-airflow/stable/ui.html).
 
+![dag runs](/assets/dag_runs.png)
+
 > [!IMPORTANT]
 > The `dbt` DAG is a task group composed of 20 tasks and dependencies. Depending
 > on resource availability, you may be required to
