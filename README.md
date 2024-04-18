@@ -1,7 +1,7 @@
 # Exploring 158 Years of Canadian Trademark Data
 
 ![preview](/assets/preview.jpg)
-[View interactive dashboard](https://lookerstudio.google.com/s/keWPSnG8YgA)
+> [View interactive dashboard](https://lookerstudio.google.com/s/keWPSnG8YgA)
 
 ## Overview
 The [oldest trademark](https://ised-isde.canada.ca/cipo/trademark-search/0042293)
@@ -47,6 +47,8 @@ analysis.
 - Cosmos
 - Looker Studio
 
+![dbt lineage graph as Airflow task group](/assets/lineage_graph.png)
+> *dbt lineage graph as Airflow task group*
 
 ### Datasets
 
