@@ -13,4 +13,4 @@ if [ -z "$PROJECT_ID" ]; then
     exit 1
 fi
 
-sed -i -e "s/project: [^[:space:]]*/project: $PROJECT_ID/g" "$PROFILES_YML_PATH"
+sed -i '' "s/project: [^[:space:]]*/project: $PROJECT_ID/g" "$PROFILES_YML_PATH"
