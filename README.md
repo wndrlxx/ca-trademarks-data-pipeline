@@ -22,6 +22,8 @@ from 1865 to 2023 and visualizing them as:
 
 ### Data Stack
 
+![architecture diagram](/assets/architecture.png)
+
 This batch ELT pipeline is comprised of several Google Cloud Platform (GCP) 
 services for ingestion, transformation, and serving. The data pipeline 
 orchestrated by Cloud Composer 2 (managed Airflow) utilizes 
@@ -46,6 +48,11 @@ analysis.
 - dbt-core
 - Cosmos
 - Looker Studio
+
+#### Data Models
+
+![dbt lineage graph](/assets/dbt_lineage_graph.png)
+> *dbt lineage graph*
 
 ![dbt lineage graph as Airflow task group](/assets/lineage_graph.png)
 > *dbt lineage graph as Airflow task group*
@@ -109,48 +116,62 @@ with billing enabled.
 *Run the following commands from the root project directory.*
 
 1. Verify the environment variables are correctly set.
+
     ```shell copy
     make env-test
     ```
+
 1. Initialize a new GCP project and service account.
+
     ```shell copy
     make gcp-up
     ```
+
 1. Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the absolute 
 path of the service account key. Terraform will need this to authenticate.
+
     ```shell copy
     export GOOGLE_APPLICATION_CREDENTIALS={{full_path_to_keyfile}}
     ```
+
     On macOS:
+
     ```shell copy
     export GOOGLE_APPLICATION_CREDENTIALS=$(realpath keys/owner-sa-key.json)
     ```
+
 1. Enable all the Google APIs required by the project.
+
     ```shell copy
     make enable-gcp-services
     ```
-1. Provision infrastructure. Type `yes` to approve actions. 
+
+1. Provision infrastructure. Type `yes` to approve actions.
     *This step can take 40+ minutes to complete.*
+
     ```shell copy
     make -f tf.Makefile up
     ```
 
     *If this step fails, you can try running:*
+
     ```shell copy
     make -f tf.Makefile retry
     ```
+
 1. Complete dbt-core setup.
+
     ```shell copy
     make dbt-setup
     ```
 
 ### 🚀 Initialize Airflow DAGs
 
-1. Navigate to your 
-[Cloud Composer environments](https://console.cloud.google.com/composer/environments) 
+1. Navigate to your
+[Cloud Composer environments](https://console.cloud.google.com/composer/environments)
 on Google Cloud console.
 1. In the Airflow webserver column, follow the link to access the Airflow UI.
-1. To initialize the data pipeline, start the ***upload_raw_trademark_files_to_gcs*** 
+1. To initialize the data pipeline, start the ***upload_raw_trademark_files_to_gcs***
 DAG by activating the ▶️ (Trigger DAG) button under the **Actions** column. 
 Subsequent DAGs will be automatically triggered upon successful completion of 
 upstream DAGs. Execution of the entire pipeline can take over 20 minutes.
