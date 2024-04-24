@@ -4,6 +4,6 @@ exposures:
     type: dashboard
     url: https://lookerstudio.google.com/s/keWPSnG8YgA
     depends_on:
-      - ref('registrations')
+      - ref('registrations_categories')
     owner:
       name: Andrew
